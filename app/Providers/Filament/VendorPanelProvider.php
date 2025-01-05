@@ -24,9 +24,8 @@ class VendorPanelProvider extends PanelProvider
     {
         return $panel
             ->id('vendor')
-            ->path('vendor')
+            ->path('vendor-shop')
             ->login()
-            ->registration()
             ->authGuard('vendor')
             ->colors([
                 'primary' => Color::Amber,

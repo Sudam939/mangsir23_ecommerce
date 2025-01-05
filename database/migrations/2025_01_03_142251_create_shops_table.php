@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('shops', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('logo');
-            $table->string('address');
+            $table->string('logo')->nullable();
+            $table->string('address')->nullable();
             $table->string('phone');
-            $table->string('map');
+            $table->string('map')->nullable();
             $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

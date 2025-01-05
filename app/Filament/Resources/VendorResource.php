@@ -17,7 +17,19 @@ class VendorResource extends Resource
 {
     protected static ?string $model = Vendor::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fab-shopware';
+    protected static ?string $navigationGroup = 'Vendor Management';
+    protected static ?int $navigationSort = 3;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('status', 'pending')->count();
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
@@ -25,21 +37,28 @@ class VendorResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->hidden()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
+                    ->hidden()
                     ->email()
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
                     ->password()
+                    ->hidden()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Select::make('status')
                     ->required()
-                    ->maxLength(255)
-                    ->default('pending'),
+                    ->options([
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                    ]),
                 Forms\Components\TextInput::make('balance')
                     ->required()
+                    ->hidden()
                     ->numeric()
                     ->default(0),
             ]);
@@ -71,8 +90,9 @@ class VendorResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                // Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -93,8 +113,8 @@ class VendorResource extends Resource
         return [
             'index' => Pages\ListVendors::route('/'),
             'create' => Pages\CreateVendor::route('/create'),
-            'view' => Pages\ViewVendor::route('/{record}'),
-            'edit' => Pages\EditVendor::route('/{record}/edit'),
+            // 'view' => Pages\ViewVendor::route('/{record}'),
+            // 'edit' => Pages\EditVendor::route('/{record}/edit'),
         ];
     }
 }
