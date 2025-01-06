@@ -1,31 +1,28 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Vendor\Resources;
 
-use App\Filament\Resources\VendorResource\Pages;
-use App\Filament\Resources\VendorResource\RelationManagers;
+use App\Filament\Vendor\Resources\VendorResource\Pages;
+use App\Filament\Vendor\Resources\VendorResource\RelationManagers;
 use App\Models\Vendor;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class VendorResource extends Resource
 {
     protected static ?string $model = Vendor::class;
 
-    protected static ?string $navigationIcon = 'fab-shopware';
-    protected static ?string $navigationGroup = 'Vendor Management';
-    protected static ?int $navigationSort = 3;
-
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('status', 'pending')->count();
-    }
-
+    protected static ?string $navigationIcon = 'heroicon-o-user-circle';
+    protected static ?string $modelLabel = 'Shop Profile';
+    protected static ?string $pluralModelLabel = 'Shop Profile';
+    
     public static function canCreate(): bool
     {
         return false;
@@ -37,41 +34,42 @@ class VendorResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->hidden()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
-                    ->hidden()
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->hidden()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('status')
-                    ->required()
-                    ->options([
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                    ]),
-                Forms\Components\TextInput::make('balance')
-                    ->required()
-                    ->hidden()
-                    ->numeric()
-                    ->default(0),
+                Repeater::make('shop')
+                    ->relationship('shop')
+                    ->columnSpanFull()
+                    ->addable(false)
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->label("Shop Name")
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('address')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('phone')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('map')
+                            ->required(),
+                        Forms\Components\FileUpload::make('logo')
+                            ->required(),
+                    ])
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->query(self::getEloquentQuery()->where('id', Auth::guard('vendor')->user()->id))
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->copyable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable(),
@@ -93,7 +91,6 @@ class VendorResource extends Resource
             ->actions([
                 // Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

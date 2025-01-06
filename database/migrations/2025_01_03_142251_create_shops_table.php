@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('logo')->nullable();
             $table->string('address')->nullable();
             $table->string('phone');
-            $table->string('map')->nullable();
+            $table->longText('map')->nullable();
             $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
