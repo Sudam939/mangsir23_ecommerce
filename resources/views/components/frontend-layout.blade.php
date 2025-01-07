@@ -9,6 +9,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{asset('frontend/style.css')}}">
     <link rel="shortcut icon" href="{{asset('favicon.ico')}}" type="image/x-icon">
+    <link rel="stylesheet" href="{{asset('fontawesome/css/all.min.css')}}">
 </head>
 
 <body>

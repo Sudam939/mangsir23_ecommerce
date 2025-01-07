@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\EmailNotification;
 use App\Models\Admin;
 use App\Models\Company;
+use App\Models\Product;
 use App\Models\Shop;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
@@ -26,7 +27,16 @@ class PageController extends Controller
 
     public function home()
     {
-        return view('frontend.home');
+        $vendors = Vendor::where('status', 'approved')->get();
+        $products = Product::where('discount', '!=', null || 0)->limit(16)->get();
+        return view('frontend.home', compact('vendors', 'products'));
+    }
+
+    public function compare(Request $request)
+    {
+        $q = $request->q;
+        $products = Product::where('name','like',"%$q%")->orderBy('price','asc')->get();
+        return view('frontend.compare', compact('products','q'));
     }
 
     public function vendor_request(Request $request)
@@ -55,7 +65,7 @@ class PageController extends Controller
             "to" => "Sudam",
             "message" => "Vendor request received from $request->name  with email $request->email and phone $request->phone and shop name $request->shop_name",
         ];
-        
+
         $admins = Admin::all();
         Mail::to($admins)->send(new EmailNotification($data));
 
