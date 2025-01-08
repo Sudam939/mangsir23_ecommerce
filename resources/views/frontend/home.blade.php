@@ -14,7 +14,7 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 py-5">
                 @foreach ($vendors as $vendor)
                     <div class="rounded-lg border hover:shadow-lg duration-300 overflow-hidden">
-                        <a href="">
+                        <a href="{{ route('vendor', $vendor->id) }}">
                             <img class="h-[260px] w-full object-cover"
                                 src="{{ asset(Storage::url($vendor->shop->logo)) }}" alt="{{ $vendor->shop->name }}">
                             <div class="px-4 py-2">
@@ -43,7 +43,7 @@
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 py-5">
                 @foreach ($products as $product)
-                    <x-product-card :product="$product"/>
+                    <x-product-card :product="$product" />
                 @endforeach
             </div>
         </div>

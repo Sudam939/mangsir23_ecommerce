@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\View;
 
 class PageController extends Controller
 {
+
     public function __construct()
     {
         $company = Company::first();
@@ -35,8 +36,8 @@ class PageController extends Controller
     public function compare(Request $request)
     {
         $q = $request->q;
-        $products = Product::where('name','like',"%$q%")->orderBy('price','asc')->get();
-        return view('frontend.compare', compact('products','q'));
+        $products = Product::where('name', 'like', "%$q%")->orderBy('price', 'asc')->get();
+        return view('frontend.compare', compact('products', 'q'));
     }
 
     public function vendor_request(Request $request)
@@ -71,5 +72,16 @@ class PageController extends Controller
 
         toast('Your request has been submitted successfully', 'success');
         return redirect()->back();
+    }
+
+    public function vendor(Request $request, $id)
+    {
+        $vendor = Vendor::findOrFail($id);
+        $products = $vendor->products;
+        $q = $request->q;
+        if ($q) {
+            $products = Product::where('name', 'like', "%$q%")->orderBy('price', 'asc')->get();
+        }
+        return view('frontend.vendor', compact('vendor', 'products'));
     }
 }
