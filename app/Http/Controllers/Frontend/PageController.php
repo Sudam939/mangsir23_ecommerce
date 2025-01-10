@@ -14,17 +14,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 
-class PageController extends Controller
+class PageController extends BaseController
 {
-
-    public function __construct()
-    {
-        $company = Company::first();
-
-        View::share([
-            'company' => $company,
-        ]);
-    }
 
     public function home()
     {

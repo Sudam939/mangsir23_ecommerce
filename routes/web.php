@@ -22,6 +22,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+    Route::post('add-to-cart', [UserController::class, 'add_to_cart'])->name('add_to_cart');
+    Route::get('cart', [UserController::class, 'cart'])->name('cart');
 });
 
 require __DIR__ . '/auth.php';
