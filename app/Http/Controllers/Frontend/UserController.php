@@ -53,7 +53,7 @@ class UserController extends BaseController
         ]);
         $user_id = Auth::user()->id;
         $product = Product::findOrFail($request->product_id);
-        $amount = $product->discount > 0 ? $product->price - ($product->price * $product->discount) / 100 : $product->price * $request->qty;
+        $amount = $product->discount > 0 ? ($product->price - ($product->price * $product->discount) / 100) * $request->qty : $product->price * $request->qty;
 
         $cart = new Cart();
         $cart->user_id = $user_id;
@@ -69,6 +69,43 @@ class UserController extends BaseController
     public function cart()
     {
         $carts = Cart::where('user_id', Auth::user()->id)->get();
-        return view('frontend.cart', compact('carts'));
+        $vendors = [];
+        foreach ($carts as $cart) {
+            $product = Product::findOrFail($cart->product_id);
+            if (!in_array($product->vendor, $vendors)) {
+                $vendors[] = $product->vendor;
+            }
+        }
+
+        return view('frontend.cart', compact('carts', 'vendors'));
+    }
+
+    public function cart_delete($id)
+    {
+        Cart::findOrFail($id)->delete();
+        return redirect()->back();
+    }
+
+    public function cart_update(Request $request, $id)
+    {
+        $request->validate([
+            'qty' => 'required|min:1',
+        ]);
+        $cart = Cart::find($id);
+        $product = Product::findOrFail($cart->product_id);
+        $amount = $product->discount > 0 ? ($product->price - ($product->price * $product->discount) / 100) * $request->qty : $product->price * $request->qty;
+
+        $cart->qty = $request->qty;
+        $cart->amount = $amount;
+        $cart->update();
+
+        toast('Cart updated successfully', 'success');
+        return redirect()->back();
+    }
+
+
+    public function profile()
+    {
+        return view('frontend.profile');
     }
 }

@@ -19,8 +19,12 @@
                     <a href="{{ route('register') }}"
                         class="border border-[var(--secondary)] secondary px-3 py-1 rounded">SIgnUp</a>
                 @else
-                    <a href="{{route('cart')}}" class="relative mr-2">
-                        <small class="absolute -right-2 -top-2 bg-red-600 px-1 text-[10px] rounded text-white">{{ Auth::user()->carts->count() }}</small>
+                    <a href="{{ route('profile') }}" class="mr-2">
+                        <i class="fa-solid fa-user text-2xl text-white"></i>
+                    </a>
+                    <a href="{{ route('cart') }}" class="relative mr-2">
+                        <small
+                            class="absolute -right-2 -top-2 bg-red-600 px-1 text-[10px] rounded text-white">{{ Auth::user()->carts->count() }}</small>
                         <i class="fa-solid fa-cart-shopping text-white text-2xl"></i>
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
