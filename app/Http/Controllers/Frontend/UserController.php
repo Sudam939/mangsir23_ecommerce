@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailNotification;
+use App\Models\Admin;
 use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderDescription;
 use App\Models\Product;
+use App\Models\ShippingAddress;
 use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 
 class UserController extends BaseController
@@ -106,6 +113,104 @@ class UserController extends BaseController
 
     public function profile()
     {
-        return view('frontend.profile');
+        $shipping_addresses = ShippingAddress::where('user_id', Auth::user()->id)->get();
+        $options = [
+            'center' => [
+                'lat' => 26.802828,
+                'lng' => 87.283137
+            ],
+            'googleview' => true,
+            'zoom' => 18,
+            'zoomControl' => true,
+            'minZoom' => 13,
+            'maxZoom' => 18,
+            'default' => 'Google Maps'
+        ];
+        $initialMarkers = [
+            [
+                'position' => [
+                    'lat' => 26.802828,
+                    'lng' => 87.283137
+                ],
+                'draggable' => false,
+                'title' => 'Dharan'
+            ]
+        ];
+
+        return view('frontend.profile', compact('shipping_addresses', 'options', 'initialMarkers'));
+    }
+
+
+
+
+    public function add_shipping_address(Request $request)
+    {
+        $request->validate([
+            'title' => 'required',
+            'address_note' => 'required',
+            'phone' => 'required',
+        ]);
+        $user_id = Auth::user()->id;
+
+        $address = new ShippingAddress();
+        $address->user_id = $user_id;
+        $address->title = $request->title;
+        $address->phone = $request->phone;
+        $address->address_note = $request->address_note;
+        $address->save();
+
+        toast('Shipping address added successfully', 'success');
+        return redirect()->back();
+    }
+
+
+    public function checkout($id)
+    {
+        return view('frontend.checkout', compact('id'));
+    }
+
+
+    public function order(Request $request, $id)
+    {
+        $total = 0;
+        $user = Auth::user();
+        $order = new Order();
+        $vendor = Vendor::findOrFail($id);
+        $order->user_id = $user->id;
+        $order->shipping_address_id = $request->shipping_address;
+        $order->payment_type = $request->payment_type;
+        foreach ($user->carts as $cart) {
+            if ($cart->product->vendor_id == $id) {
+                $total += $cart->amount;
+            }
+        }
+        $order->total_amount = $total;
+        $order->save();
+
+
+        foreach ($user->carts as $cart) {
+            if ($cart->product->vendor_id == $id) {
+                $orderD = new OrderDescription();
+                $orderD->order_id = $order->id;
+                $orderD->product_id = $cart->product_id;
+                $orderD->qty = $cart->qty;
+                $orderD->amount = $cart->amount;
+                $orderD->save();
+
+                $cart->delete();
+            }
+        }
+        $admins = Admin::all();
+
+        $data = [
+            "subject" => "New Order",
+            "to" => $user->email,
+            "message" => "You have a new order from $user->name of $vendor->name. The order id is $order->id.",
+        ];
+
+        Mail::to($admins)->send(new EmailNotification($data));
+
+        toast('Order Placed successfully', 'success');
+        return redirect()->back();
     }
 }

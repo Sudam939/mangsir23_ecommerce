@@ -92,7 +92,7 @@
                             <b>Total:</b> Rs. {{ $total }}
                         </p>
 
-                        <button class="bg-primary px-4 py-2 text-white rounded">PROCEED TO CHECKOUT</button>
+                        <a href="{{ route('checkout', $vendor['id']) }}" class="bg-primary px-4 py-2 text-white rounded">PROCEED TO CHECKOUT</a>
                     </div>
                 </div>
             @endforeach
