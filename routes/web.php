@@ -3,6 +3,8 @@
 use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Company;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -34,7 +36,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('checkout/{id}', [UserController::class, 'checkout'])->name('checkout');
     Route::post('order/{id}', [UserController::class, 'order'])->name('order');
-
 });
+
+Route::get('/order-detail/{id}', function ($id) {
+    $order = Order::findOrFail($id);
+    $company = Company::first();
+    return view('order_detail', compact('order', 'company'));
+})->name('order.detail');
 
 require __DIR__ . '/auth.php';
