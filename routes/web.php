@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Models\Company;
 use App\Models\Order;
 use App\Models\Product;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/google-login', [UserController::class, 'google_login'])->name('google_login');
@@ -43,5 +44,24 @@ Route::get('/order-detail/{id}', function ($id) {
     $company = Company::first();
     return view('order_detail', compact('order', 'company'));
 })->name('order.detail');
+
+
+Route::get('/order/success', function () {
+    $id = Cookie::get('order_id');
+
+    $order = Order::findOrFail($id);
+    $order->status = "approved";
+    $order->update();
+
+    return redirect()->route('profile');
+});
+
+Route::get('/payment/failure', function () {
+    toast('Something went wrong', 'error');
+
+
+    return redirect()->route('profile');
+});
+
 
 require __DIR__ . '/auth.php';

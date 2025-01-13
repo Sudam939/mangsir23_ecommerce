@@ -14,9 +14,11 @@ use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
+use Zerkxubas\EsewaLaravel\Facades\Esewa;
 
 class UserController extends BaseController
 {
@@ -209,6 +211,15 @@ class UserController extends BaseController
         ];
 
         Mail::to($admins)->send(new EmailNotification($data));
+
+        $pid = uniqid();
+
+        if ($request->payment_type == 'esewa') {
+            Cookie::queue('order_id', $order->id, 60*5);
+            return Esewa::checkout($pid, $total, 0);
+        }
+
+        return "hello";
 
         toast('Order Placed successfully', 'success');
         return redirect()->back();
