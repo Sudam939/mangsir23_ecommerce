@@ -219,8 +219,6 @@ class UserController extends BaseController
             return Esewa::checkout($pid, $total, 0);
         }
 
-        return "hello";
-
         toast('Order Placed successfully', 'success');
         return redirect()->back();
     }
