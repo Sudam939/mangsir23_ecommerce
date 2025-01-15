@@ -13,6 +13,7 @@
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
         "owenvoke/blade-fontawesome": "^2.8",
+        "pxlrbt/filament-excel": "^2.3",
         "realrashid/sweet-alert": "^7.2",
         "zerkxubas/esewa-laravel": "^1.1"
     },
