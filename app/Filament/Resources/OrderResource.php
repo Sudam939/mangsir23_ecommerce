@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -67,13 +69,19 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('status')
+                    ->multiple()
+                    ->options([
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                    ]),
             ])
             ->actions([
                 Action::make("Detail")
-                    ->url(fn($record)=> route('order.detail', $record->id), shouldOpenInNewTab: true)
+                    ->url(fn($record) => route('order.detail', $record->id), shouldOpenInNewTab: true)
                     ->label("Order Detail"),
-                    
+
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

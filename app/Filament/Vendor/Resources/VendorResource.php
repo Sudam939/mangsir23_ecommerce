@@ -22,7 +22,7 @@ class VendorResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
     protected static ?string $modelLabel = 'Shop Profile';
     protected static ?string $pluralModelLabel = 'Shop Profile';
-    
+
     public static function canCreate(): bool
     {
         return false;

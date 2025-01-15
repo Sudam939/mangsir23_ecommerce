@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -82,6 +83,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('discount')
                     ->suffix('%')
                     ->sortable(),
+                Tables\Columns\ToggleColumn::make('is_featured'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -92,7 +94,9 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Filter::make('is_featured')
+                    ->toggle()
+                    ->query(fn(Builder $query): Builder => $query->where('is_featured', true))
             ])
             ->actions([
                 // Tables\Actions\ViewAction::make(),
