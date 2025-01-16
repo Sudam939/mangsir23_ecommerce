@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
@@ -14,6 +15,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class CategoryResource extends Resource
@@ -94,6 +97,18 @@ class CategoryResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     ExportBulkAction::make(),
+                    Tables\Actions\BulkAction::make('Export')
+                        ->icon('heroicon-m-arrow-down-tray')
+                        ->label('Export PDF')
+                        ->openUrlInNewTab()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function (Collection $records) {
+                            return response()->streamDownload(function () use ($records) {
+                                echo Pdf::loadHTML(
+                                    Blade::render('pdf', ['records' => $records])
+                                )->stream();
+                            }, 'categories.pdf');
+                        }),
                 ]),
             ]);
     }
