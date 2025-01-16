@@ -6,12 +6,15 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class CategoryResource extends Resource
 {
@@ -31,14 +34,33 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('commission')
-                    ->required()
-                    ->label("Commission Percentage")
-                    ->suffix('%')
-                    ->numeric(),
+                // Forms\Components\TextInput::make('name')
+                //     ->required()
+                //     ->maxLength(255),
+                // Forms\Components\TextInput::make('commission')
+                //     ->required()
+                //     ->label("Commission Percentage")
+                //     ->suffix('%')
+                //     ->numeric(),
+
+                Wizard::make([
+                    Step::make('Name')
+                        ->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->required()
+                                ->maxLength(255),
+                        ]),
+                    Step::make('Commission')
+                        ->schema([
+                            Forms\Components\TextInput::make('commission')
+                                ->required()
+                                ->label("Commission Percentage")
+                                ->suffix('%')
+                                ->numeric(),
+                        ])
+                ])
+                    ->columnSpanFull()
+
             ]);
     }
 
@@ -71,6 +93,7 @@ class CategoryResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }

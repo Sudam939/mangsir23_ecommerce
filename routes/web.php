@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Frontend\UserController;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Company;
 use App\Models\Order;
@@ -62,6 +63,11 @@ Route::get('/payment/failure', function () {
 
     return redirect()->route('profile');
 });
+
+
+
+Route::get('/category-pdf/{record}', [PdfController::class, 'category'])->name('category.pdf');
+
 
 
 require __DIR__ . '/auth.php';
